@@ -1,0 +1,15 @@
+# HarmonyOS 项目专属忽略规则
+# 编译产物
+build/
+entry/build/
+.hvigor/
+# IDE配置和缓存
+.idea/
+*.log
+local.properties
+# 编译生成的安装包
+*.hap
+*.har
+# 系统文件
+.DS_Store
+Thumbs.db

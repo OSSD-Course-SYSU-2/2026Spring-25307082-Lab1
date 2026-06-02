@@ -19,6 +19,10 @@
     {
       "name": "count",
       "value": "Number"
+    },
+    {
+      "name": "permission_distributed",
+      "value": "用于分布式流转功能"
     }
   ]
 }

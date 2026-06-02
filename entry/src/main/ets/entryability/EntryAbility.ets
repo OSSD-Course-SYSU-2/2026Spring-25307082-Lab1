@@ -16,13 +16,24 @@
 import { UIAbility, Want, AbilityConstant } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
+import { DistributedManager } from '../viewmodel/DistributedManager';
 
 export default class EntryAbility extends UIAbility {
+  private distributedManager: DistributedManager = DistributedManager.getInstance();
+
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     hilog.isLoggable(0x0000, 'testTag', hilog.LogLevel.INFO);
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onCreate');
     hilog.info(0x0000, 'testTag', '%{public}s', 'want param:' + JSON.stringify(want) ?? '');
     hilog.info(0x0000, 'testTag', '%{public}s', 'launchParam:' + JSON.stringify(launchParam) ?? '');
+    
+    this.distributedManager.init(this.context);
+  }
+
+  onContinue(wantParam: Record<string, Object>): AbilityConstant.OnContinueResult {
+    hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onContinue');
+    this.distributedManager.saveContinueData(wantParam);
+    return AbilityConstant.OnContinueResult.AGREE;
   }
 
   onDestroy(): void | Promise<void> {

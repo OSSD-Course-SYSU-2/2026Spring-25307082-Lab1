@@ -17,16 +17,43 @@ import { AnimationWidgets } from '../view/AnimationWidgets';
 import { CountController } from '../view/CountController';
 import Common from '../common/constants/Const';
 import {IconsModel} from '../viewmodel/IconsModel';
+import { DistributedManager } from '../viewmodel/DistributedManager';
+import { DeviceAdapter, DeviceType } from '../viewmodel/DeviceAdapter';
 
 @Entry
 @Component
 struct Index {
   @State quantity: number = Common.IMAGES_MIN;
   @Provide iconModel: IconsModel = new IconsModel(this.quantity, Common.OFFSET_RADIUS);
+  private distributedManager: DistributedManager = DistributedManager.getInstance();
+  private deviceAdapter: DeviceAdapter = DeviceAdapter.getInstance();
+  @State deviceInfo: string = '';
 
+  aboutToAppear() {
+    this.deviceAdapter.init().then(() => {
+      this.deviceInfo = `设备: ${this.deviceAdapter.getDeviceType()}`;
+    });
+  }
 
   build() {
     Column() {
+      Row() {
+        Text(this.deviceInfo)
+          .fontSize(12)
+          .fontColor('#999999')
+        
+        Blank()
+        
+        Button('流转')
+          .fontSize(14)
+          .onClick(() => {
+            this.distributedManager.startMigration();
+          })
+      }
+      .width('100%')
+      .justifyContent(FlexAlign.SpaceBetween)
+      .padding({ left: 20, right: 20, top: 10 })
+
       AnimationWidgets({
         quantity: $quantity
       })

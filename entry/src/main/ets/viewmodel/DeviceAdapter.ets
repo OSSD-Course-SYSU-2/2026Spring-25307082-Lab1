@@ -8,6 +8,11 @@ export enum DeviceType {
   DEFAULT = 'default'
 }
 
+export interface ScreenSize {
+  width: number;
+  height: number;
+}
+
 export class DeviceAdapter {
   private static instance: DeviceAdapter;
   private deviceType: DeviceType = DeviceType.DEFAULT;
@@ -42,6 +47,8 @@ export class DeviceAdapter {
         this.deviceType = DeviceType.PHONE;
       }
     } catch (error) {
+      const err = error as Error;
+      console.error('DeviceAdapter init error:', err.message);
       this.deviceType = DeviceType.DEFAULT;
     }
   }
@@ -50,8 +57,12 @@ export class DeviceAdapter {
     return this.deviceType;
   }
 
-  getScreenSize(): { width: number; height: number } {
-    return { width: this.screenWidth, height: this.screenHeight };
+  getScreenSize(): ScreenSize {
+    const size: ScreenSize = {
+      width: this.screenWidth,
+      height: this.screenHeight
+    };
+    return size;
   }
 
   getIconSize(): number {

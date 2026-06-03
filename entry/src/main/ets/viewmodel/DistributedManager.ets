@@ -1,4 +1,4 @@
-import distributedDeviceManager from '@ohos.distributedDeviceManager';
+import { distributedDeviceManager } from '@kit.DistributedServiceKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import common from '@ohos.app.ability.common';
 
@@ -12,72 +12,120 @@ export interface DeviceInfo {
 }
 
 export class DistributedManager {
+  private static instance: DistributedManager | null = null;
   private deviceManager: distributedDeviceManager.DeviceManager | null = null;
-  private context: common.UIAbilityContext;
-  private deviceList: DeviceInfo[] = [];
+  private context: common.UIAbilityContext | null = null;
+  private continueData: Record<string, Object> = {};
 
-  constructor(context: common.UIAbilityContext) {
+  private constructor() {}
+
+  static getInstance(): DistributedManager {
+    if (!DistributedManager.instance) {
+      DistributedManager.instance = new DistributedManager();
+    }
+    return DistributedManager.instance;
+  }
+
+  init(context: common.UIAbilityContext): void {
     this.context = context;
     this.initDeviceManager();
   }
 
   private initDeviceManager(): void {
     try {
-      const deviceInfo: distributedDeviceManager.DeviceInfo = {
-        deviceId: 'local',
-        deviceName: 'local',
-        deviceType: distributedDeviceManager.DeviceType.UNKNOWN,
-        networkId: 'local'
+      const authInfo: distributedDeviceManager.AuthParam = {
+        authType: distributedDeviceManager.AuthType.SAME_ACCOUNT,
+        extraInfo: {}
       };
       
-      this.deviceManager = distributedDeviceManager.createDeviceManager('com.example.animation', deviceInfo);
-      hilog.info(DOMAIN_CODE, TAG, 'DeviceManager created');
+      this.deviceManager = distributedDeviceManager.createDeviceManager('com.example.animation', authInfo);
+      hilog.info(DOMAIN_CODE, TAG, 'DeviceManager created successfully');
     } catch (error) {
-      hilog.error(DOMAIN_CODE, TAG, 'Failed to create DeviceManager: %{public}s', JSON.stringify(error));
+      const err = error as Error;
+      hilog.error(DOMAIN_CODE, TAG, 'Failed to create DeviceManager: %{public}s', err.message);
     }
+  }
+
+  saveContinueData(wantParam: Record<string, Object>): void {
+    this.continueData = wantParam;
+    hilog.info(DOMAIN_CODE, TAG, 'Continue data saved');
+  }
+
+  getContinueData(): Record<string, Object> {
+    return this.continueData;
   }
 
   getDeviceList(): DeviceInfo[] {
     if (!this.deviceManager) {
+      hilog.warn(DOMAIN_CODE, TAG, 'DeviceManager is null');
       return [];
     }
     
     try {
       const devices = this.deviceManager.getAvailableDeviceListSync();
-      return devices.map((device: distributedDeviceManager.DeviceInfo) => ({
-        deviceId: device.deviceId,
-        deviceName: device.deviceName,
-        deviceType: this.getDeviceTypeName(device.deviceType)
-      }));
+      hilog.info(DOMAIN_CODE, TAG, 'Available devices: %{public}d', devices.length);
+      
+      const deviceList: DeviceInfo[] = [];
+      for (let i = 0; i < devices.length; i++) {
+        const device = devices[i];
+        const info: DeviceInfo = {
+          deviceId: device.deviceId,
+          deviceName: device.deviceName,
+          deviceType: this.getDeviceTypeName(device.deviceType)
+        };
+        deviceList.push(info);
+      }
+      return deviceList;
     } catch (error) {
-      hilog.error(DOMAIN_CODE, TAG, 'Failed to get device list: %{public}s', JSON.stringify(error));
+      const err = error as Error;
+      hilog.error(DOMAIN_CODE, TAG, 'Failed to get device list: %{public}s', err.message);
       return [];
     }
   }
 
   private getDeviceTypeName(deviceType: number): string {
-    switch (deviceType) {
-      case distributedDeviceManager.DeviceType.PHONE:
-        return '手机';
-      case distributedDeviceManager.DeviceType.TABLET:
-        return '平板';
-      case distributedDeviceManager.DeviceType.TV:
-        return '电视';
-      case distributedDeviceManager.DeviceType.WEARABLE:
-        return '手表';
-      default:
-        return '未知设备';
+    if (deviceType === 0x00) {
+      return '手机';
+    } else if (deviceType === 0x01) {
+      return '平板';
+    } else if (deviceType === 0x02) {
+      return '电视';
+    } else if (deviceType === 0x06) {
+      return '手表';
+    } else {
+      return '未知设备';
     }
   }
 
   async continueToRemote(deviceId: string): Promise<void> {
-    try {
-      await this.context.continueAbility(deviceId);
-      hilog.info(DOMAIN_CODE, TAG, 'Continue to remote device: %{public}s', deviceId);
-    } catch (error) {
-      hilog.error(DOMAIN_CODE, TAG, 'Failed to continue: %{public}s', JSON.stringify(error));
-      throw error;
+    if (!this.context) {
+      hilog.error(DOMAIN_CODE, TAG, 'Context is null');
+      throw new Error('Context not initialized');
     }
+
+    try {
+      hilog.info(DOMAIN_CODE, TAG, 'Starting continue to device: %{public}s', deviceId);
+      await this.context.continueAbility(deviceId);
+      hilog.info(DOMAIN_CODE, TAG, 'Continue to remote device succeeded');
+    } catch (error) {
+      const err = error as Error;
+      hilog.error(DOMAIN_CODE, TAG, 'Failed to continue: %{public}s', err.message);
+      throw new Error(err.message);
+    }
+  }
+
+  async startMigration(): Promise<void> {
+    const devices = this.getDeviceList();
+    
+    if (devices.length === 0) {
+      hilog.warn(DOMAIN_CODE, TAG, 'No available devices for migration');
+      return;
+    }
+
+    const targetDevice = devices[0];
+    hilog.info(DOMAIN_CODE, TAG, 'Migrating to device: %{public}s', targetDevice.deviceName);
+    
+    await this.continueToRemote(targetDevice.deviceId);
   }
 
   release(): void {
@@ -86,7 +134,8 @@ export class DistributedManager {
         distributedDeviceManager.releaseDeviceManager(this.deviceManager);
         hilog.info(DOMAIN_CODE, TAG, 'DeviceManager released');
       } catch (error) {
-        hilog.error(DOMAIN_CODE, TAG, 'Failed to release: %{public}s', JSON.stringify(error));
+        const err = error as Error;
+        hilog.error(DOMAIN_CODE, TAG, 'Failed to release: %{public}s', err.message);
       }
       this.deviceManager = null;
     }

@@ -36,9 +36,19 @@ export default class EntryAbility extends UIAbility {
     return AbilityConstant.OnContinueResult.AGREE;
   }
 
+  onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+    hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onNewWant');
+    if (launchParam.launchReason === AbilityConstant.LaunchReason.CONTINUATION) {
+      hilog.info(0x0000, 'testTag', '%{public}s', 'Launched by continuation');
+      const continueData = this.distributedManager.getContinueData();
+      hilog.info(0x0000, 'testTag', 'Continue data: %{public}s', JSON.stringify(continueData));
+    }
+  }
+
   onDestroy(): void | Promise<void> {
     hilog.isLoggable(0x0000, 'testTag', hilog.LogLevel.INFO);
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onDestroy');
+    this.distributedManager.release();
   }
 
   onWindowStageCreate(windowStage: window.WindowStage): void {

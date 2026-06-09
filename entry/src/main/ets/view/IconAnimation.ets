@@ -15,45 +15,62 @@
 
 import IconItem from '../viewmodel/IconItem';
 import Common from '../common/constants/Const';
+import { DeviceAdapter } from '../viewmodel/DeviceAdapter';
 
 @Component
 export struct IconAnimation {
   @Link mainFlag: boolean;
   @ObjectLink item: IconItem;
+  @Link showFeature: boolean;
+  @Link featureIndex: number;
+  private deviceAdapter: DeviceAdapter = DeviceAdapter.getInstance();
+  
+  private iconTexts: string[] = ['表', '餐', '书', '件', '坛', '易'];
+  private iconColors: string[] = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD'];
 
   build() {
-    Image(this.item.image)
-      .width(Common.ICON_WIDTH)
-      .height(Common.ICON_HEIGHT)
-      .objectFit(ImageFit.Contain)
-      .borderRadius(16) // 圆角半径，可调整为24/20等
-      .shadow({        // 阴影配置，增强立体感
-        radius: 12,    // 阴影模糊半径
-        color: Color.Black, // 阴影颜色
-        offsetX: 0,    // 水平偏移
-        offsetY: 6,    // 垂直偏移（向下）
-        fill: true     // 是否填充阴影
-      })
-      .translate(this.mainFlag ? { x: this.item.point.x, y: this.item.point.y } : { x: 0, y: 0 })
-      .rotate({
-        x: 0,
-        y: 1,
-        z: 0,
-        angle: this.item.clicked ? Common.ROTATE_ANGLE_360 : 0
-      })
-      .scale(this.item.clicked ? { x: Common.SCALE_RATIO, y: Common.SCALE_RATIO } : { x: 1, y: 1 })
-      .opacity(this.item.clicked ? Common.OPACITY_06 : 1)
-      .onClick(() => {
-        this.item.clicked = !this.item.clicked;
-      })
-      .animation(
-        {
-          delay: Common.DELAY_10,
-          duration: Common.DURATION_1000,
-          iterations: 1,
-          curve: Curve.EaseInOut,
-          playMode: PlayMode.Normal
-        }
-      )
+    Column() {
+      Text(this.iconTexts[this.item.index])
+        .fontSize(this.deviceAdapter.getIconSize() * 0.6)
+        .fontColor(Color.White)
+        .fontWeight(FontWeight.Bold)
+    }
+    .width(this.deviceAdapter.getIconSize())
+    .height(this.deviceAdapter.getIconSize())
+    .backgroundColor(this.iconColors[this.item.index])
+    .borderRadius(this.deviceAdapter.getIconSize() * 0.3)
+    .justifyContent(FlexAlign.Center)
+    .shadow({
+      radius: 12,
+      color: Color.Black,
+      offsetX: 0,
+      offsetY: 6,
+      fill: true
+    })
+    .translate(this.mainFlag ? { x: this.item.point.x, y: this.item.point.y } : { x: 0, y: 0 })
+    .rotate({
+      x: 0,
+      y: 1,
+      z: 0,
+      angle: this.item.clicked ? Common.ROTATE_ANGLE_360 : 0
+    })
+    .scale(this.item.clicked ? { x: Common.SCALE_RATIO, y: Common.SCALE_RATIO } : { x: 1, y: 1 })
+    .opacity(this.item.clicked ? Common.OPACITY_06 : 1)
+    .onClick(() => {
+      this.item.clicked = !this.item.clicked;
+      if (this.mainFlag && !this.item.clicked) {
+        this.featureIndex = this.item.index;
+        this.showFeature = true;
+      }
+    })
+    .animation(
+      {
+        delay: Common.DELAY_10,
+        duration: Common.DURATION_1000,
+        iterations: 1,
+        curve: Curve.EaseInOut,
+        playMode: PlayMode.Normal
+      }
+    )
   }
 }

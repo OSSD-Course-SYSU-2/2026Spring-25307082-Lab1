@@ -18,8 +18,15 @@ import { CountController } from '../view/CountController';
 import Common from '../common/constants/Const';
 import {IconsModel} from '../viewmodel/IconsModel';
 import { DistributedManager, DeviceInfo } from '../viewmodel/DistributedManager';
-import { DeviceAdapter, DeviceType } from '../viewmodel/DeviceAdapter';
+import { DeviceAdapter, DeviceType, BreakpointType } from '../viewmodel/DeviceAdapter';
+import { FeaturePage } from '../view/FeaturePage';
 import { promptAction } from '@kit.ArkUI';
+import { hilog } from '@kit.PerformanceAnalysisKit';
+
+interface ShowToastOptions {
+  message: string;
+  duration: number;
+}
 
 @Entry
 @Component
@@ -32,10 +39,14 @@ struct Index {
   @State deviceList: DeviceInfo[] = [];
   @State showDeviceList: boolean = false;
   @State isMigrating: boolean = false;
+  @State breakpointType: BreakpointType = BreakpointType.SM;
+  @State showFeature: boolean = false;
+  @State featureIndex: number = 0;
 
   aboutToAppear() {
     this.deviceAdapter.init().then(() => {
-      this.deviceInfo = `设备: ${this.deviceAdapter.getDeviceType()}`;
+      this.deviceInfo = `设备: ${this.deviceAdapter.getDeviceType()} | 断点: ${this.deviceAdapter.getBreakpointType()}`;
+      this.breakpointType = this.deviceAdapter.getBreakpointType();
     });
   }
 
@@ -43,12 +54,14 @@ struct Index {
     this.deviceList = this.distributedManager.getDeviceList();
     if (this.deviceList.length === 0) {
       try {
-        promptAction.showToast({
+        const options: ShowToastOptions = {
           message: '未发现可流转设备',
           duration: 2000
-        });
+        };
+        promptAction.showToast(options);
       } catch (error) {
-        console.error('showToast error:', error);
+        const err = error as Error;
+        hilog.error(0x0000, 'Index', 'showToast error: %{public}s', err.message);
       }
     }
   }
@@ -59,22 +72,26 @@ struct Index {
     
     try {
       try {
-        promptAction.showToast({
+        const options: ShowToastOptions = {
           message: `正在流转到 ${deviceName}...`,
           duration: 2000
-        });
+        };
+        promptAction.showToast(options);
       } catch (err) {
-        console.error('showToast error:', err);
+        const error = err as Error;
+        hilog.error(0x0000, 'Index', 'showToast error: %{public}s', error.message);
       }
       await this.distributedManager.continueToRemote(deviceId);
     } catch (error) {
       try {
-        promptAction.showToast({
+        const options: ShowToastOptions = {
           message: '流转失败',
           duration: 2000
-        });
+        };
+        promptAction.showToast(options);
       } catch (err) {
-        console.error('showToast error:', err);
+        const error = err as Error;
+        hilog.error(0x0000, 'Index', 'showToast error: %{public}s', error.message);
       }
     } finally {
       this.isMigrating = false;
@@ -86,13 +103,14 @@ struct Index {
       Column() {
         Row() {
           Text(this.deviceInfo)
-            .fontSize(12)
+            .fontSize(this.deviceAdapter.getFontSize())
             .fontColor('#999999')
           
           Blank()
           
           Button(this.isMigrating ? '流转中...' : '流转')
-            .fontSize(14)
+            .fontSize(this.deviceAdapter.getFontSize())
+            .height(this.deviceAdapter.getButtonHeight())
             .enabled(!this.isMigrating)
             .onClick(() => {
               this.refreshDeviceList();
@@ -101,15 +119,41 @@ struct Index {
         }
         .width('100%')
         .justifyContent(FlexAlign.SpaceBetween)
-        .padding({ left: 20, right: 20, top: 10 })
-
-        AnimationWidgets({
-          quantity: $quantity
+        .padding({ 
+          left: this.deviceAdapter.getLayoutConfig().margin, 
+          right: this.deviceAdapter.getLayoutConfig().margin, 
+          top: 10 
         })
 
-        CountController({
-          quantity: $quantity
-        })
+        if (this.deviceAdapter.isHorizontalLayout()) {
+          Row() {
+            AnimationWidgets({
+              quantity: $quantity,
+              showFeature: $showFeature,
+              featureIndex: $featureIndex
+            })
+            
+            CountController({
+              quantity: $quantity
+            })
+          }
+          .width(Common.DEFAULT_FULL_WIDTH)
+          .height(Common.DEFAULT_FULL_HEIGHT)
+        } else {
+          Column() {
+            AnimationWidgets({
+              quantity: $quantity,
+              showFeature: $showFeature,
+              featureIndex: $featureIndex
+            })
+
+            CountController({
+              quantity: $quantity
+            })
+          }
+          .width(Common.DEFAULT_FULL_WIDTH)
+          .layoutWeight(1)
+        }
       }
       .width(Common.DEFAULT_FULL_WIDTH)
       .height(Common.DEFAULT_FULL_HEIGHT)
@@ -178,6 +222,13 @@ struct Index {
         .justifyContent(FlexAlign.Center)
         .onClick(() => {
           this.showDeviceList = false;
+        })
+      }
+
+      if (this.showFeature) {
+        FeaturePage({
+          featureIndex: this.featureIndex,
+          showFeature: $showFeature
         })
       }
     }

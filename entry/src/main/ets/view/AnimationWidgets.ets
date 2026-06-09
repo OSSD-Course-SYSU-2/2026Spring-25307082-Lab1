@@ -23,6 +23,8 @@ export struct AnimationWidgets {
   @State mainFlag: boolean = false;
   @Link @Watch('onQuantityChange') quantity: number;
   @Consume iconModel: IconsModel;
+  @Link showFeature: boolean;
+  @Link featureIndex: number;
 
   onQuantityChange() {
     this.iconModel.addImage(this.quantity);
@@ -52,7 +54,9 @@ export struct AnimationWidgets {
         ForEach(this.iconModel.imagerArr, (item: IconItem) => {
           IconAnimation({
             item: item,
-            mainFlag: $mainFlag
+            mainFlag: $mainFlag,
+            showFeature: $showFeature,
+            featureIndex: $featureIndex
           })
         }, (item: IconItem) => JSON.stringify(item.index))
       }

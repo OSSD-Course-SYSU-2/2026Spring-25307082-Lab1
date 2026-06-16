@@ -16,6 +16,7 @@ interface FeatureConfig {
   iconText: string;
   color: string;
   features: string[];
+  leaveTypes?: string[];
 }
 
 @Component
@@ -30,7 +31,8 @@ export struct FeaturePage {
       description: '查看每日课程安排', 
       iconText: '表',
       color: '#FF6B6B',
-      features: ['今日课程一目了然', '课前提醒通知']
+      features: ['今日课程一目了然', '课前提醒通知', '请假申请'],
+      leaveTypes: ['病假', '事假', '公假', '其他']
     },
     { 
       title: '校园食堂', 
@@ -146,7 +148,37 @@ export struct FeaturePage {
         .borderRadius(12)
       }
       .width('85%')
-      .margin({ bottom: 25 })
+      .margin({ bottom: 15 })
+
+      if (this.featureConfigs[this.featureIndex].leaveTypes && this.featureConfigs[this.featureIndex].leaveTypes!.length > 0) {
+        Column() {
+          Text('请假类型')
+            .fontSize(18)
+            .fontWeight(FontWeight.Medium)
+            .fontColor('#333333')
+            .margin({ bottom: 15 })
+
+          Row() {
+            ForEach(this.featureConfigs[this.featureIndex].leaveTypes, (type: string) => {
+              Column() {
+                Text(type)
+                  .fontSize(14)
+                  .fontColor('#333333')
+              }
+              .padding({ left: 12, right: 12, top: 8, bottom: 8 })
+              .backgroundColor('#F0F0F0')
+              .borderRadius(15)
+            }, (type: string) => type)
+          }
+          .width('100%')
+          .justifyContent(FlexAlign.SpaceAround)
+        }
+        .width('85%')
+        .padding(15)
+        .backgroundColor('#F8F8F8')
+        .borderRadius(12)
+        .margin({ bottom: 15 })
+      }
 
       Column() {
         Text('温馨提示')

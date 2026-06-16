@@ -733,17 +733,36 @@ export struct FeaturePage {
       }
       
       if (featureIdx === 2 && this.featureConfigs[this.featureIndex].leaveTypes) {
-        Row() {
-          ForEach(this.featureConfigs[this.featureIndex].leaveTypes, (type: string) => {
-            Text(type)
-              .fontSize(14)
-              .fontColor('#333333')
-              .padding({ left: 12, right: 12, top: 6, bottom: 6 })
-              .backgroundColor('#E8E8E8')
-              .borderRadius(12)
-              .margin({ right: 8 })
-          }, (type: string) => type)
+        Column() {
+          Text('选择请假类型：')
+            .fontSize(14)
+            .fontColor('#666666')
+            .margin({ bottom: 10 })
+          
+          Row() {
+            ForEach(this.featureConfigs[this.featureIndex].leaveTypes, (type: string) => {
+              Column() {
+                Text(type)
+                  .fontSize(15)
+                  .fontColor('#333333')
+                  .fontWeight(FontWeight.Medium)
+              }
+              .padding({ left: 16, right: 16, top: 10, bottom: 10 })
+              .backgroundColor('#FFFFFF')
+              .borderRadius(8)
+              .border({ width: 1, color: '#E0E0E0' })
+              .margin({ right: 10 })
+            }, (type: string) => type)
+          }
+          .width('100%')
+          .justifyContent(FlexAlign.Start)
+          
+          Text('点击类型可提交请假申请')
+            .fontSize(12)
+            .fontColor('#999999')
+            .margin({ top: 10 })
         }
+        .width('100%')
       }
       
       if (featureIdx === 3 && this.featureConfigs[this.featureIndex].homeworks) {

@@ -235,14 +235,7 @@ export struct FeaturePage {
               })
 
               if (this.expandedFeature === index) {
-                Column() {
-                  this.FeatureContentBuilder(index)
-                }
-                .width('100%')
-                .padding({ left: 20, top: 10, bottom: 10 })
-                .backgroundColor('#FFFFFF')
-                .borderRadius(8)
-                .margin({ top: 5 })
+                this.FeatureContentBuilder(index)
               }
             }
             .width('100%')
@@ -731,6 +724,11 @@ export struct FeaturePage {
             .padding({ top: 8, bottom: 8 })
           }, (item: ScheduleItem) => item.time)
         }
+        .width('100%')
+        .padding({ left: 20, top: 10, bottom: 10 })
+        .backgroundColor('#FFFFFF')
+        .borderRadius(8)
+        .margin({ top: 5 })
       }
       
       if (featureIdx === 2 && this.featureConfigs[this.featureIndex].homeworks) {
@@ -760,6 +758,11 @@ export struct FeaturePage {
             .padding({ top: 8, bottom: 8 })
           }, (homework: HomeworkItem) => homework.title)
         }
+        .width('100%')
+        .padding({ left: 20, top: 10, bottom: 10 })
+        .backgroundColor('#FFFFFF')
+        .borderRadius(8)
+        .margin({ top: 5 })
       }
     }
     
@@ -790,6 +793,11 @@ export struct FeaturePage {
           .padding({ top: 8, bottom: 8 })
         }, (item: MenuItem) => item.name)
       }
+      .width('100%')
+      .padding({ left: 20, top: 10, bottom: 10 })
+      .backgroundColor('#FFFFFF')
+      .borderRadius(8)
+      .margin({ top: 5 })
     }
     
     if (this.featureIndex === 2 && featureIdx === 0 && this.featureConfigs[this.featureIndex].librarySeats) {
@@ -810,6 +818,11 @@ export struct FeaturePage {
           .padding({ top: 8, bottom: 8 })
         }, (item: LibrarySeatItem) => item.area)
       }
+      .width('100%')
+      .padding({ left: 20, top: 10, bottom: 10 })
+      .backgroundColor('#FFFFFF')
+      .borderRadius(8)
+      .margin({ top: 5 })
     }
     
     if (this.featureIndex === 3 && featureIdx === 0 && this.featureConfigs[this.featureIndex].expresses) {
@@ -836,6 +849,11 @@ export struct FeaturePage {
           .padding({ top: 8, bottom: 8 })
         }, (item: ExpressItem) => item.code)
       }
+      .width('100%')
+      .padding({ left: 20, top: 10, bottom: 10 })
+      .backgroundColor('#FFFFFF')
+      .borderRadius(8)
+      .margin({ top: 5 })
     }
     
     if (this.featureIndex === 4 && featureIdx === 0 && this.featureConfigs[this.featureIndex].posts) {
@@ -867,6 +885,11 @@ export struct FeaturePage {
           .padding({ top: 8, bottom: 8 })
         }, (item: PostItem) => item.title)
       }
+      .width('100%')
+      .padding({ left: 20, top: 10, bottom: 10 })
+      .backgroundColor('#FFFFFF')
+      .borderRadius(8)
+      .margin({ top: 5 })
     }
     
     if (this.featureIndex === 5 && featureIdx === 0 && this.featureConfigs[this.featureIndex].products) {
@@ -896,6 +919,11 @@ export struct FeaturePage {
           .padding({ top: 8, bottom: 8 })
         }, (item: ProductItem) => item.name)
       }
+      .width('100%')
+      .padding({ left: 20, top: 10, bottom: 10 })
+      .backgroundColor('#FFFFFF')
+      .borderRadius(8)
+      .margin({ top: 5 })
     }
   }
 }

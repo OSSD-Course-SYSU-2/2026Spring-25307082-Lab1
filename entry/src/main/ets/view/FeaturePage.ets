@@ -84,8 +84,10 @@ export struct FeaturePage {
       leaveTypes: ['病假', '事假', '公假', '其他'],
       homeworks: [
         { title: '高等数学作业', deadline: '2026-06-17', daysLeft: 1 },
-        { title: '数据结构实验', deadline: '2026-06-18', daysLeft: 2 },
-        { title: '英语作文', deadline: '2026-06-20', daysLeft: 4 }
+        { title: '物理实验报告', deadline: '2026-06-18', daysLeft: 2 },
+        { title: '数据结构实验', deadline: '2026-06-19', daysLeft: 3 },
+        { title: '英语作文', deadline: '2026-06-20', daysLeft: 4 },
+        { title: '操作系统项目', deadline: '2026-06-23', daysLeft: 7 }
       ],
       schedule: [
         { time: '08:00-09:35', course: '高等数学', location: '教学楼A301' },
@@ -285,7 +287,7 @@ export struct FeaturePage {
                   
                   Text(`截止：${homework.deadline}`)
                     .fontSize(13)
-                    .fontColor(homework.daysLeft <= 1 ? '#FF0000' : '#666666')
+                    .fontColor(homework.daysLeft <= 1 ? '#FF0000' : (homework.daysLeft <= 3 ? '#FF9800' : '#666666'))
                     .margin({ top: 5 })
                 }
                 .alignItems(HorizontalAlign.Start)
@@ -294,7 +296,7 @@ export struct FeaturePage {
                 Column() {
                   Text(`${homework.daysLeft}天`)
                     .fontSize(16)
-                    .fontColor(homework.daysLeft <= 1 ? '#FF0000' : '#4CAF50')
+                    .fontColor(homework.daysLeft <= 1 ? '#FF0000' : (homework.daysLeft <= 3 ? '#FF9800' : '#4CAF50'))
                     .fontWeight(FontWeight.Bold)
                 }
               }
@@ -308,15 +310,39 @@ export struct FeaturePage {
           }
           .width('100%')
 
-          Row() {
-            Text('⚠️')
-              .fontSize(14)
+          Column() {
+            Row() {
+              Text('●')
+                .fontSize(12)
+                .fontColor('#FF0000')
+              
+              Text(' ≤1天（紧急）')
+                .fontSize(12)
+                .fontColor('#666666')
+            }
             
-            Text('红色标注表示即将到期（≤1天）')
-              .fontSize(12)
-              .fontColor('#FF0000')
-              .margin({ left: 5 })
+            Row() {
+              Text('●')
+                .fontSize(12)
+                .fontColor('#FF9800')
+              
+              Text(' 2-3天（警告）')
+                .fontSize(12)
+                .fontColor('#666666')
+            }
+            
+            Row() {
+              Text('●')
+                .fontSize(12)
+                .fontColor('#4CAF50')
+              
+              Text(' >3天（正常）')
+                .fontSize(12)
+                .fontColor('#666666')
+            }
           }
+          .width('100%')
+          .alignItems(HorizontalAlign.Start)
           .margin({ top: 10 })
         }
         .width('85%')

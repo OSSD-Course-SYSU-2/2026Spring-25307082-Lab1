@@ -16,7 +16,7 @@ interface FeatureConfig {
   iconText: string;
   color: string;
   features: string[];
-  leaveTypes?: string[];
+
   homeworks?: HomeworkItem[];
   schedule?: ScheduleItem[];
   menu?: MenuItem[];
@@ -81,8 +81,7 @@ export struct FeaturePage {
       description: '查看每日课程安排', 
       iconText: '表',
       color: '#FF6B6B',
-      features: ['今日课程一目了然', '课前提醒通知', '请假申请', '作业到期提醒'],
-      leaveTypes: ['病假', '事假', '公假', '其他'],
+      features: ['今日课程一目了然', '课前提醒通知', '作业到期提醒'],
       homeworks: [
         { title: '高等数学作业', deadline: '2026-06-17', daysLeft: 1 },
         { title: '物理实验报告', deadline: '2026-06-18', daysLeft: 2 },
@@ -734,40 +733,7 @@ export struct FeaturePage {
         }
       }
       
-      if (featureIdx === 2 && this.featureConfigs[this.featureIndex].leaveTypes) {
-        Column() {
-          Text('选择请假类型：')
-            .fontSize(14)
-            .fontColor('#666666')
-            .margin({ bottom: 10 })
-          
-          Row() {
-            ForEach(this.featureConfigs[this.featureIndex].leaveTypes, (type: string) => {
-              Column() {
-                Text(type)
-                  .fontSize(15)
-                  .fontColor('#333333')
-                  .fontWeight(FontWeight.Medium)
-              }
-              .padding({ left: 16, right: 16, top: 10, bottom: 10 })
-              .backgroundColor('#FFFFFF')
-              .borderRadius(8)
-              .border({ width: 1, color: '#E0E0E0' })
-              .margin({ right: 10 })
-            }, (type: string) => type)
-          }
-          .width('100%')
-          .justifyContent(FlexAlign.Start)
-          
-          Text('点击类型可提交请假申请')
-            .fontSize(12)
-            .fontColor('#999999')
-            .margin({ top: 10 })
-        }
-        .width('100%')
-      }
-      
-      if (featureIdx === 3 && this.featureConfigs[this.featureIndex].homeworks) {
+      if (featureIdx === 2 && this.featureConfigs[this.featureIndex].homeworks) {
         Column() {
           ForEach(this.featureConfigs[this.featureIndex].homeworks, (homework: HomeworkItem) => {
             Row() {

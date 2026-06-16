@@ -44,7 +44,7 @@ export struct FeaturePage {
       description: '座位预约和图书查询', 
       iconText: '书',
       color: '#45B7D1',
-      features: ['座位剩余查询', '图书检索预约']
+      features: ['座位剩余查询', '图书检索预约', '自习室查询']
     },
     { 
       title: '快递查询', 

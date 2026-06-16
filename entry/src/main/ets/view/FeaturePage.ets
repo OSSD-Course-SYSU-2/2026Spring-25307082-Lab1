@@ -18,12 +18,54 @@ interface FeatureConfig {
   features: string[];
   leaveTypes?: string[];
   homeworks?: HomeworkItem[];
+  schedule?: ScheduleItem[];
+  menu?: MenuItem[];
+  librarySeats?: LibrarySeatItem[];
+  expresses?: ExpressItem[];
+  posts?: PostItem[];
+  products?: ProductItem[];
 }
 
 interface HomeworkItem {
   title: string;
   deadline: string;
   daysLeft: number;
+}
+
+interface ScheduleItem {
+  time: string;
+  course: string;
+  location: string;
+}
+
+interface MenuItem {
+  name: string;
+  price: string;
+  canteen: string;
+}
+
+interface LibrarySeatItem {
+  area: string;
+  total: number;
+  available: number;
+}
+
+interface ExpressItem {
+  company: string;
+  code: string;
+  location: string;
+}
+
+interface PostItem {
+  title: string;
+  author: string;
+  time: string;
+}
+
+interface ProductItem {
+  name: string;
+  price: string;
+  seller: string;
 }
 
 @Component
@@ -44,6 +86,12 @@ export struct FeaturePage {
         { title: '高等数学作业', deadline: '2026-06-17', daysLeft: 1 },
         { title: '数据结构实验', deadline: '2026-06-18', daysLeft: 2 },
         { title: '英语作文', deadline: '2026-06-20', daysLeft: 4 }
+      ],
+      schedule: [
+        { time: '08:00-09:35', course: '高等数学', location: '教学楼A301' },
+        { time: '10:00-11:35', course: '数据结构', location: '计算机楼B202' },
+        { time: '14:00-15:35', course: '大学英语', location: '外语楼C105' },
+        { time: '16:00-17:35', course: '操作系统', location: '计算机楼B301' }
       ]
     },
     { 
@@ -51,35 +99,61 @@ export struct FeaturePage {
       description: '查看食堂菜单和价格', 
       iconText: '餐',
       color: '#4ECDC4',
-      features: ['实时更新每日菜单', '显示菜品价格']
+      features: ['实时更新每日菜单', '显示菜品价格'],
+      menu: [
+        { name: '红烧肉', price: '￥12', canteen: '一食堂' },
+        { name: '糖醋排骨', price: '￥15', canteen: '一食堂' },
+        { name: '宫保鸡丁', price: '￥10', canteen: '二食堂' },
+        { name: '清蒸鲈鱼', price: '￥18', canteen: '二食堂' }
+      ]
     },
     { 
       title: '图书馆', 
       description: '座位预约和图书查询', 
       iconText: '书',
       color: '#45B7D1',
-      features: ['座位剩余查询', '图书检索预约', '自习室查询']
+      features: ['座位剩余查询', '图书检索预约', '自习室查询'],
+      librarySeats: [
+        { area: '一楼阅览区', total: 200, available: 45 },
+        { area: '二楼自习室', total: 150, available: 23 },
+        { area: '三楼电子区', total: 100, available: 67 }
+      ]
     },
     { 
       title: '快递查询', 
       description: '查询快递取件信息', 
       iconText: '件',
       color: '#96CEB4',
-      features: ['快递到件通知', '取件码查询']
+      features: ['快递到件通知', '取件码查询'],
+      expresses: [
+        { company: '顺丰快递', code: 'SF123456', location: '东门快递点' },
+        { company: '中通快递', code: 'ZT789012', location: '西门快递点' },
+        { company: '韵达快递', code: 'YD345678', location: '南门快递点' }
+      ]
     },
     { 
       title: '校园论坛', 
       description: '查看校园动态和话题', 
       iconText: '坛',
       color: '#FFEAA7',
-      features: ['校园热点话题', '失物招领信息']
+      features: ['校园热点话题', '失物招领信息'],
+      posts: [
+        { title: '【求助】有没有人捡到一张校园卡？', author: '张同学', time: '2小时前' },
+        { title: '【分享】期末复习资料整理', author: '李同学', time: '5小时前' },
+        { title: '【活动】周末社团招新', author: '学生会', time: '1天前' }
+      ]
     },
     { 
       title: '二手市场', 
       description: '校园二手物品交易', 
       iconText: '易',
       color: '#DDA0DD',
-      features: ['发布闲置物品', '分类浏览搜索']
+      features: ['发布闲置物品', '分类浏览搜索'],
+      products: [
+        { name: '二手教材《高等数学》', price: '￥25', seller: '王同学' },
+        { name: '九成新台灯', price: '￥35', seller: '赵同学' },
+        { name: '自行车一辆', price: '￥150', seller: '刘同学' }
+      ]
     }
   ];
 
@@ -244,6 +318,284 @@ export struct FeaturePage {
               .margin({ left: 5 })
           }
           .margin({ top: 10 })
+        }
+        .width('85%')
+        .padding(15)
+        .backgroundColor('#F8F8F8')
+        .borderRadius(12)
+        .margin({ bottom: 15 })
+      }
+
+      if (this.featureConfigs[this.featureIndex].schedule && this.featureConfigs[this.featureIndex].schedule!.length > 0) {
+        Column() {
+          Text('今日课程安排')
+            .fontSize(18)
+            .fontWeight(FontWeight.Medium)
+            .fontColor('#333333')
+            .margin({ bottom: 15 })
+
+          Column() {
+            ForEach(this.featureConfigs[this.featureIndex].schedule, (item: ScheduleItem, index: number) => {
+              Row() {
+                Column() {
+                  Text(item.time)
+                    .fontSize(14)
+                    .fontColor('#666666')
+                  
+                  Text(item.course)
+                    .fontSize(16)
+                    .fontColor('#333333')
+                    .fontWeight(FontWeight.Medium)
+                    .margin({ top: 5 })
+                  
+                  Text(item.location)
+                    .fontSize(13)
+                    .fontColor('#999999')
+                    .margin({ top: 3 })
+                }
+                .alignItems(HorizontalAlign.Start)
+                .layoutWeight(1)
+              }
+              .width('100%')
+              .padding({ top: 12, bottom: 12 })
+              .border({
+                width: { bottom: index < this.featureConfigs[this.featureIndex].schedule!.length - 1 ? 1 : 0 },
+                color: '#E0E0E0'
+              })
+            }, (item: ScheduleItem, index: number) => index.toString())
+          }
+          .width('100%')
+        }
+        .width('85%')
+        .padding(15)
+        .backgroundColor('#F8F8F8')
+        .borderRadius(12)
+        .margin({ bottom: 15 })
+      }
+
+      if (this.featureConfigs[this.featureIndex].menu && this.featureConfigs[this.featureIndex].menu!.length > 0) {
+        Column() {
+          Text('今日推荐菜品')
+            .fontSize(18)
+            .fontWeight(FontWeight.Medium)
+            .fontColor('#333333')
+            .margin({ bottom: 15 })
+
+          Column() {
+            ForEach(this.featureConfigs[this.featureIndex].menu, (item: MenuItem, index: number) => {
+              Row() {
+                Column() {
+                  Text(item.name)
+                    .fontSize(16)
+                    .fontColor('#333333')
+                    .fontWeight(FontWeight.Medium)
+                  
+                  Text(item.canteen)
+                    .fontSize(13)
+                    .fontColor('#999999')
+                    .margin({ top: 3 })
+                }
+                .alignItems(HorizontalAlign.Start)
+                .layoutWeight(1)
+
+                Text(item.price)
+                  .fontSize(16)
+                  .fontColor('#FF6B6B')
+                  .fontWeight(FontWeight.Bold)
+              }
+              .width('100%')
+              .padding({ top: 12, bottom: 12 })
+              .border({
+                width: { bottom: index < this.featureConfigs[this.featureIndex].menu!.length - 1 ? 1 : 0 },
+                color: '#E0E0E0'
+              })
+            }, (item: MenuItem, index: number) => index.toString())
+          }
+          .width('100%')
+        }
+        .width('85%')
+        .padding(15)
+        .backgroundColor('#F8F8F8')
+        .borderRadius(12)
+        .margin({ bottom: 15 })
+      }
+
+      if (this.featureConfigs[this.featureIndex].librarySeats && this.featureConfigs[this.featureIndex].librarySeats!.length > 0) {
+        Column() {
+          Text('座位使用情况')
+            .fontSize(18)
+            .fontWeight(FontWeight.Medium)
+            .fontColor('#333333')
+            .margin({ bottom: 15 })
+
+          Column() {
+            ForEach(this.featureConfigs[this.featureIndex].librarySeats, (item: LibrarySeatItem, index: number) => {
+              Row() {
+                Text(item.area)
+                  .fontSize(15)
+                  .fontColor('#333333')
+                  .layoutWeight(1)
+
+                Text(`${item.available}/${item.total}`)
+                  .fontSize(15)
+                  .fontColor(item.available < 30 ? '#FF6B6B' : '#4CAF50')
+                  .fontWeight(FontWeight.Bold)
+              }
+              .width('100%')
+              .padding({ top: 12, bottom: 12 })
+              .border({
+                width: { bottom: index < this.featureConfigs[this.featureIndex].librarySeats!.length - 1 ? 1 : 0 },
+                color: '#E0E0E0'
+              })
+            }, (item: LibrarySeatItem, index: number) => index.toString())
+          }
+          .width('100%')
+        }
+        .width('85%')
+        .padding(15)
+        .backgroundColor('#F8F8F8')
+        .borderRadius(12)
+        .margin({ bottom: 15 })
+      }
+
+      if (this.featureConfigs[this.featureIndex].expresses && this.featureConfigs[this.featureIndex].expresses!.length > 0) {
+        Column() {
+          Text('待取快递')
+            .fontSize(18)
+            .fontWeight(FontWeight.Medium)
+            .fontColor('#333333')
+            .margin({ bottom: 15 })
+
+          Column() {
+            ForEach(this.featureConfigs[this.featureIndex].expresses, (item: ExpressItem, index: number) => {
+              Row() {
+                Column() {
+                  Text(item.company)
+                    .fontSize(15)
+                    .fontColor('#333333')
+                    .fontWeight(FontWeight.Medium)
+                  
+                  Text(`取件码：${item.code}`)
+                    .fontSize(13)
+                    .fontColor('#666666')
+                    .margin({ top: 3 })
+                  
+                  Text(item.location)
+                    .fontSize(13)
+                    .fontColor('#999999')
+                    .margin({ top: 3 })
+                }
+                .alignItems(HorizontalAlign.Start)
+                .layoutWeight(1)
+              }
+              .width('100%')
+              .padding({ top: 12, bottom: 12 })
+              .border({
+                width: { bottom: index < this.featureConfigs[this.featureIndex].expresses!.length - 1 ? 1 : 0 },
+                color: '#E0E0E0'
+              })
+            }, (item: ExpressItem, index: number) => index.toString())
+          }
+          .width('100%')
+        }
+        .width('85%')
+        .padding(15)
+        .backgroundColor('#F8F8F8')
+        .borderRadius(12)
+        .margin({ bottom: 15 })
+      }
+
+      if (this.featureConfigs[this.featureIndex].posts && this.featureConfigs[this.featureIndex].posts!.length > 0) {
+        Column() {
+          Text('热门帖子')
+            .fontSize(18)
+            .fontWeight(FontWeight.Medium)
+            .fontColor('#333333')
+            .margin({ bottom: 15 })
+
+          Column() {
+            ForEach(this.featureConfigs[this.featureIndex].posts, (item: PostItem, index: number) => {
+              Row() {
+                Column() {
+                  Text(item.title)
+                    .fontSize(15)
+                    .fontColor('#333333')
+                    .fontWeight(FontWeight.Medium)
+                  
+                  Row() {
+                    Text(item.author)
+                      .fontSize(12)
+                      .fontColor('#999999')
+                    
+                    Text(' · ')
+                      .fontSize(12)
+                      .fontColor('#999999')
+                    
+                    Text(item.time)
+                      .fontSize(12)
+                      .fontColor('#999999')
+                  }
+                  .margin({ top: 5 })
+                }
+                .alignItems(HorizontalAlign.Start)
+                .layoutWeight(1)
+              }
+              .width('100%')
+              .padding({ top: 12, bottom: 12 })
+              .border({
+                width: { bottom: index < this.featureConfigs[this.featureIndex].posts!.length - 1 ? 1 : 0 },
+                color: '#E0E0E0'
+              })
+            }, (item: PostItem, index: number) => index.toString())
+          }
+          .width('100%')
+        }
+        .width('85%')
+        .padding(15)
+        .backgroundColor('#F8F8F8')
+        .borderRadius(12)
+        .margin({ bottom: 15 })
+      }
+
+      if (this.featureConfigs[this.featureIndex].products && this.featureConfigs[this.featureIndex].products!.length > 0) {
+        Column() {
+          Text('热门商品')
+            .fontSize(18)
+            .fontWeight(FontWeight.Medium)
+            .fontColor('#333333')
+            .margin({ bottom: 15 })
+
+          Column() {
+            ForEach(this.featureConfigs[this.featureIndex].products, (item: ProductItem, index: number) => {
+              Row() {
+                Column() {
+                  Text(item.name)
+                    .fontSize(15)
+                    .fontColor('#333333')
+                    .fontWeight(FontWeight.Medium)
+                  
+                  Text(`卖家：${item.seller}`)
+                    .fontSize(13)
+                    .fontColor('#999999')
+                    .margin({ top: 3 })
+                }
+                .alignItems(HorizontalAlign.Start)
+                .layoutWeight(1)
+
+                Text(item.price)
+                  .fontSize(16)
+                  .fontColor('#FF6B6B')
+                  .fontWeight(FontWeight.Bold)
+              }
+              .width('100%')
+              .padding({ top: 12, bottom: 12 })
+              .border({
+                width: { bottom: index < this.featureConfigs[this.featureIndex].products!.length - 1 ? 1 : 0 },
+                color: '#E0E0E0'
+              })
+            }, (item: ProductItem, index: number) => index.toString())
+          }
+          .width('100%')
         }
         .width('85%')
         .padding(15)

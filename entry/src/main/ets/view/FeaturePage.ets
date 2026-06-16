@@ -17,6 +17,13 @@ interface FeatureConfig {
   color: string;
   features: string[];
   leaveTypes?: string[];
+  homeworks?: HomeworkItem[];
+}
+
+interface HomeworkItem {
+  title: string;
+  deadline: string;
+  daysLeft: number;
 }
 
 @Component
@@ -31,8 +38,13 @@ export struct FeaturePage {
       description: '查看每日课程安排', 
       iconText: '表',
       color: '#FF6B6B',
-      features: ['今日课程一目了然', '课前提醒通知', '请假申请'],
-      leaveTypes: ['病假', '事假', '公假', '其他']
+      features: ['今日课程一目了然', '课前提醒通知', '请假申请', '作业到期提醒'],
+      leaveTypes: ['病假', '事假', '公假', '其他'],
+      homeworks: [
+        { title: '高等数学作业', deadline: '2026-06-17', daysLeft: 1 },
+        { title: '数据结构实验', deadline: '2026-06-18', daysLeft: 2 },
+        { title: '英语作文', deadline: '2026-06-20', daysLeft: 4 }
+      ]
     },
     { 
       title: '校园食堂', 
@@ -172,6 +184,66 @@ export struct FeaturePage {
           }
           .width('100%')
           .justifyContent(FlexAlign.SpaceAround)
+        }
+        .width('85%')
+        .padding(15)
+        .backgroundColor('#F8F8F8')
+        .borderRadius(12)
+        .margin({ bottom: 15 })
+      }
+
+      if (this.featureConfigs[this.featureIndex].homeworks && this.featureConfigs[this.featureIndex].homeworks!.length > 0) {
+        Column() {
+          Text('作业到期提醒')
+            .fontSize(18)
+            .fontWeight(FontWeight.Medium)
+            .fontColor('#333333')
+            .margin({ bottom: 15 })
+
+          Column() {
+            ForEach(this.featureConfigs[this.featureIndex].homeworks, (homework: HomeworkItem, index: number) => {
+              Row() {
+                Column() {
+                  Text(homework.title)
+                    .fontSize(15)
+                    .fontColor('#333333')
+                    .fontWeight(FontWeight.Medium)
+                  
+                  Text(`截止：${homework.deadline}`)
+                    .fontSize(13)
+                    .fontColor(homework.daysLeft <= 1 ? '#FF0000' : '#666666')
+                    .margin({ top: 5 })
+                }
+                .alignItems(HorizontalAlign.Start)
+                .layoutWeight(1)
+
+                Column() {
+                  Text(`${homework.daysLeft}天`)
+                    .fontSize(16)
+                    .fontColor(homework.daysLeft <= 1 ? '#FF0000' : '#4CAF50')
+                    .fontWeight(FontWeight.Bold)
+                }
+              }
+              .width('100%')
+              .padding({ top: 10, bottom: 10 })
+              .border({
+                width: { bottom: index < this.featureConfigs[this.featureIndex].homeworks!.length - 1 ? 1 : 0 },
+                color: '#E0E0E0'
+              })
+            }, (homework: HomeworkItem, index: number) => index.toString())
+          }
+          .width('100%')
+
+          Row() {
+            Text('⚠️')
+              .fontSize(14)
+            
+            Text('红色标注表示即将到期（≤1天）')
+              .fontSize(12)
+              .fontColor('#FF0000')
+              .margin({ left: 5 })
+          }
+          .margin({ top: 10 })
         }
         .width('85%')
         .padding(15)

@@ -73,6 +73,7 @@ export struct FeaturePage {
   @Prop featureIndex: number = 0;
   @Link showFeature: boolean;
   private deviceAdapter: DeviceAdapter = DeviceAdapter.getInstance();
+  @State expandedFeature: number = -1; // -1表示没有展开任何功能
   
   private featureConfigs: FeatureConfig[] = [
     { 
@@ -212,18 +213,40 @@ export struct FeaturePage {
 
         Column() {
           ForEach(this.featureConfigs[this.featureIndex].features, (feature: string, index: number) => {
-            Row() {
-              Text('●')
-                .fontSize(14)
-                .fontColor(this.featureConfigs[this.featureIndex].color)
-                .margin({ right: 10 })
+            Column() {
+              Row() {
+                Text(this.expandedFeature === index ? '▼' : '▶')
+                  .fontSize(12)
+                  .fontColor(this.featureConfigs[this.featureIndex].color)
+                  .margin({ right: 10 })
 
-              Text(feature)
-                .fontSize(16)
-                .fontColor('#333333')
+                Text(feature)
+                  .fontSize(16)
+                  .fontColor('#333333')
+                  .layoutWeight(1)
+              }
+              .width('100%')
+              .padding({ top: 12, bottom: 12 })
+              .onClick(() => {
+                if (this.expandedFeature === index) {
+                  this.expandedFeature = -1;
+                } else {
+                  this.expandedFeature = index;
+                }
+              })
+
+              if (this.expandedFeature === index) {
+                Column() {
+                  this.FeatureContentBuilder(index)
+                }
+                .width('100%')
+                .padding({ left: 20, top: 10, bottom: 10 })
+                .backgroundColor('#FFFFFF')
+                .borderRadius(8)
+                .margin({ top: 5 })
+              }
             }
             .width('100%')
-            .padding({ top: 12, bottom: 12 })
             .border({
               width: { bottom: index < this.featureConfigs[this.featureIndex].features.length - 1 ? 1 : 0 },
               color: '#E0E0E0'
@@ -238,8 +261,7 @@ export struct FeaturePage {
       .width('85%')
       .margin({ bottom: 15 })
 
-      if (this.featureConfigs[this.featureIndex].leaveTypes && this.featureConfigs[this.featureIndex].leaveTypes!.length > 0) {
-        Column() {
+      Column() {
           Text('请假类型')
             .fontSize(18)
             .fontWeight(FontWeight.Medium)
@@ -679,5 +701,204 @@ export struct FeaturePage {
     .width('100%')
     .height('100%')
     .backgroundColor(Color.White)
+  }
+
+  @Builder
+  FeatureContentBuilder(featureIdx: number) {
+    if (this.featureIndex === 0) { // 课程表
+      if (featureIdx === 0 && this.featureConfigs[this.featureIndex].schedule) {
+        ForEach(this.featureConfigs[this.featureIndex].schedule, (item: ScheduleItem) => {
+          Row() {
+            Column() {
+              Text(item.time)
+                .fontSize(13)
+                .fontColor('#666666')
+              
+              Text(item.course)
+                .fontSize(15)
+                .fontColor('#333333')
+                .fontWeight(FontWeight.Medium)
+                .margin({ top: 3 })
+              
+              Text(item.location)
+                .fontSize(12)
+                .fontColor('#999999')
+                .margin({ top: 2 })
+            }
+            .alignItems(HorizontalAlign.Start)
+          }
+          .width('100%')
+          .padding({ top: 8, bottom: 8 })
+        }, (item: ScheduleItem) => item.time)
+      }
+      
+      if (featureIdx === 2 && this.featureConfigs[this.featureIndex].leaveTypes) {
+        Row() {
+          ForEach(this.featureConfigs[this.featureIndex].leaveTypes, (type: string) => {
+            Text(type)
+              .fontSize(14)
+              .fontColor('#333333')
+              .padding({ left: 12, right: 12, top: 6, bottom: 6 })
+              .backgroundColor('#E8E8E8')
+              .borderRadius(12)
+              .margin({ right: 8 })
+          }, (type: string) => type)
+        }
+      }
+      
+      if (featureIdx === 3 && this.featureConfigs[this.featureIndex].homeworks) {
+        Column() {
+          ForEach(this.featureConfigs[this.featureIndex].homeworks, (homework: HomeworkItem) => {
+            Row() {
+              Column() {
+                Text(homework.title)
+                  .fontSize(14)
+                  .fontColor('#333333')
+                  .fontWeight(FontWeight.Medium)
+                
+                Text(`截止：${homework.deadline}`)
+                  .fontSize(12)
+                  .fontColor(homework.daysLeft <= 1 ? '#FF0000' : (homework.daysLeft <= 3 ? '#FF9800' : '#666666'))
+                  .margin({ top: 3 })
+              }
+              .alignItems(HorizontalAlign.Start)
+              .layoutWeight(1)
+
+              Text(`${homework.daysLeft}天`)
+                .fontSize(15)
+                .fontColor(homework.daysLeft <= 1 ? '#FF0000' : (homework.daysLeft <= 3 ? '#FF9800' : '#4CAF50'))
+                .fontWeight(FontWeight.Bold)
+            }
+            .width('100%')
+            .padding({ top: 8, bottom: 8 })
+          }, (homework: HomeworkItem) => homework.title)
+        }
+      }
+    }
+    
+    if (this.featureIndex === 1 && featureIdx === 0 && this.featureConfigs[this.featureIndex].menu) {
+      ForEach(this.featureConfigs[this.featureIndex].menu, (item: MenuItem) => {
+        Row() {
+          Column() {
+            Text(item.name)
+              .fontSize(15)
+              .fontColor('#333333')
+              .fontWeight(FontWeight.Medium)
+            
+            Text(item.canteen)
+              .fontSize(12)
+              .fontColor('#999999')
+              .margin({ top: 2 })
+          }
+          .alignItems(HorizontalAlign.Start)
+          .layoutWeight(1)
+
+          Text(item.price)
+            .fontSize(15)
+            .fontColor('#FF6B6B')
+            .fontWeight(FontWeight.Bold)
+        }
+        .width('100%')
+        .padding({ top: 8, bottom: 8 })
+      }, (item: MenuItem) => item.name)
+    }
+    
+    if (this.featureIndex === 2 && featureIdx === 0 && this.featureConfigs[this.featureIndex].librarySeats) {
+      ForEach(this.featureConfigs[this.featureIndex].librarySeats, (item: LibrarySeatItem) => {
+        Row() {
+          Text(item.area)
+            .fontSize(14)
+            .fontColor('#333333')
+            .layoutWeight(1)
+
+          Text(`${item.available}/${item.total}`)
+            .fontSize(14)
+            .fontColor(item.available < 30 ? '#FF6B6B' : '#4CAF50')
+            .fontWeight(FontWeight.Bold)
+        }
+        .width('100%')
+        .padding({ top: 8, bottom: 8 })
+      }, (item: LibrarySeatItem) => item.area)
+    }
+    
+    if (this.featureIndex === 3 && featureIdx === 0 && this.featureConfigs[this.featureIndex].expresses) {
+      ForEach(this.featureConfigs[this.featureIndex].expresses, (item: ExpressItem) => {
+        Column() {
+          Text(item.company)
+            .fontSize(14)
+            .fontColor('#333333')
+            .fontWeight(FontWeight.Medium)
+          
+          Text(`取件码：${item.code}`)
+            .fontSize(12)
+            .fontColor('#666666')
+            .margin({ top: 2 })
+          
+          Text(item.location)
+            .fontSize(12)
+            .fontColor('#999999')
+            .margin({ top: 2 })
+        }
+        .alignItems(HorizontalAlign.Start)
+        .width('100%')
+        .padding({ top: 8, bottom: 8 })
+      }, (item: ExpressItem) => item.code)
+    }
+    
+    if (this.featureIndex === 4 && featureIdx === 0 && this.featureConfigs[this.featureIndex].posts) {
+      ForEach(this.featureConfigs[this.featureIndex].posts, (item: PostItem) => {
+        Column() {
+          Text(item.title)
+            .fontSize(14)
+            .fontColor('#333333')
+            .fontWeight(FontWeight.Medium)
+          
+          Row() {
+            Text(item.author)
+              .fontSize(11)
+              .fontColor('#999999')
+            
+            Text(' · ')
+              .fontSize(11)
+              .fontColor('#999999')
+            
+            Text(item.time)
+              .fontSize(11)
+              .fontColor('#999999')
+          }
+          .margin({ top: 3 })
+        }
+        .alignItems(HorizontalAlign.Start)
+        .width('100%')
+        .padding({ top: 8, bottom: 8 })
+      }, (item: PostItem) => item.title)
+    }
+    
+    if (this.featureIndex === 5 && featureIdx === 0 && this.featureConfigs[this.featureIndex].products) {
+      ForEach(this.featureConfigs[this.featureIndex].products, (item: ProductItem) => {
+        Row() {
+          Column() {
+            Text(item.name)
+              .fontSize(14)
+              .fontColor('#333333')
+              .fontWeight(FontWeight.Medium)
+            
+            Text(`卖家：${item.seller}`)
+              .fontSize(12)
+              .fontColor('#999999')
+              .margin({ top: 2 })
+          }
+          .alignItems(HorizontalAlign.Start)
+          .layoutWeight(1)
+
+          Text(item.price)
+            .fontSize(15)
+            .fontColor('#FF6B6B')
+            .fontWeight(FontWeight.Bold)
+        }
+        .width('100%')
+        .padding({ top: 8, bottom: 8 })
+      }, (item: ProductItem) => item.name)
+    }
   }
 }

@@ -68,6 +68,7 @@ export struct FeaturePage {
   @State searchArea: string = '';
   @State searchTime: string = '';
   @State showSearchResult: boolean = false;
+  @State searchResults: ClassroomSeat[] = [];
   
   private featureTitles: string[] = ['课程表', '校园食堂', '图书馆', '快递查询', '校园论坛', '二手市场'];
   private featureDescs: string[] = ['查看每日课程安排', '查看食堂菜单和价格', '座位预约和图书查询', '查询快递取件信息', '查看校园动态和话题', '校园二手物品交易'];
@@ -125,8 +126,7 @@ export struct FeaturePage {
     { classroom: '三楼电子区', time: '16:00-18:00', total: 100, available: 34, status: '空闲' }
   ];
   
-  private searchResults: ClassroomSeat[] = [];
-  
+
   searchSeats() {
     this.searchResults = [];
     for (let i = 0; i < this.classroomSeats.length; i++) {

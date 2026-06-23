@@ -34,6 +34,14 @@ interface LibrarySeatItem {
   available: number;
 }
 
+interface ClassroomSeat {
+  classroom: string;
+  time: string;
+  total: number;
+  available: number;
+  status: string;
+}
+
 interface ExpressItem {
   company: string;
   code: string;
@@ -57,6 +65,9 @@ export struct FeaturePage {
   @Prop featureIndex: number = 0;
   @Link showFeature: boolean;
   private deviceAdapter: DeviceAdapter = DeviceAdapter.getInstance();
+  @State searchArea: string = '';
+  @State searchTime: string = '';
+  @State showSearchResult: boolean = false;
   
   private featureTitles: string[] = ['课程表', '校园食堂', '图书馆', '快递查询', '校园论坛', '二手市场'];
   private featureDescs: string[] = ['查看每日课程安排', '查看食堂菜单和价格', '座位预约和图书查询', '查询快递取件信息', '查看校园动态和话题', '校园二手物品交易'];
@@ -98,6 +109,48 @@ export struct FeaturePage {
     { area: '二楼自习室', total: 150, available: 23 },
     { area: '三楼电子区', total: 100, available: 67 }
   ];
+  
+  private classroomSeats: ClassroomSeat[] = [
+    { classroom: '一楼阅览区', time: '08:00-10:00', total: 200, available: 45, status: '空闲' },
+    { classroom: '一楼阅览区', time: '10:00-12:00', total: 200, available: 32, status: '紧张' },
+    { classroom: '一楼阅览区', time: '14:00-16:00', total: 200, available: 78, status: '空闲' },
+    { classroom: '一楼阅览区', time: '16:00-18:00', total: 200, available: 15, status: '紧张' },
+    { classroom: '二楼自习室', time: '08:00-10:00', total: 150, available: 23, status: '紧张' },
+    { classroom: '二楼自习室', time: '10:00-12:00', total: 150, available: 56, status: '空闲' },
+    { classroom: '二楼自习室', time: '14:00-16:00', total: 150, available: 12, status: '紧张' },
+    { classroom: '二楼自习室', time: '16:00-18:00', total: 150, available: 89, status: '空闲' },
+    { classroom: '三楼电子区', time: '08:00-10:00', total: 100, available: 67, status: '空闲' },
+    { classroom: '三楼电子区', time: '10:00-12:00', total: 100, available: 45, status: '空闲' },
+    { classroom: '三楼电子区', time: '14:00-16:00', total: 100, available: 8, status: '紧张' },
+    { classroom: '三楼电子区', time: '16:00-18:00', total: 100, available: 34, status: '空闲' }
+  ];
+  
+  private searchResults: ClassroomSeat[] = [];
+  
+  searchSeats() {
+    this.searchResults = [];
+    for (let i = 0; i < this.classroomSeats.length; i++) {
+      const item = this.classroomSeats[i];
+      let matchArea = true;
+      let matchTime = true;
+      
+      if (this.searchArea.length > 0) {
+        matchArea = item.classroom.indexOf(this.searchArea) >= 0;
+      }
+      
+      if (this.searchTime.length > 0) {
+        matchTime = item.time.indexOf(this.searchTime) >= 0;
+      }
+      
+      if (matchArea && matchTime) {
+        this.searchResults.push(item);
+      }
+    }
+    
+    if (this.searchResults.length > 0) {
+      this.showSearchResult = true;
+    }
+  }
   
   private expresses: ExpressItem[] = [
     { company: '顺丰快递', code: 'SF123456', location: '东门快递点' },
@@ -358,7 +411,136 @@ export struct FeaturePage {
 
       if (this.featureIndex === 2) {
         Column() {
-          Text('座位使用情况')
+          Text('座位查询')
+            .fontSize(18)
+            .fontWeight(FontWeight.Medium)
+            .fontColor('#333333')
+            .margin({ bottom: 15 })
+
+          Column() {
+            Row() {
+              Text('教室：')
+                .fontSize(14)
+                .fontColor('#666666')
+                .width(50)
+              
+              TextInput({ placeholder: '输入教室名称', text: this.searchArea })
+                .fontSize(14)
+                .layoutWeight(1)
+                .height(40)
+                .backgroundColor('#FFFFFF')
+                .border({ width: 1, color: '#E0E0E0', radius: 6 })
+                .onChange((value: string) => {
+                  this.searchArea = value;
+                })
+            }
+            .width('100%')
+            .margin({ bottom: 10 })
+
+            Row() {
+              Text('时间：')
+                .fontSize(14)
+                .fontColor('#666666')
+                .width(50)
+              
+              TextInput({ placeholder: '输入时间段（如08:00）', text: this.searchTime })
+                .fontSize(14)
+                .layoutWeight(1)
+                .height(40)
+                .backgroundColor('#FFFFFF')
+                .border({ width: 1, color: '#E0E0E0', radius: 6 })
+                .onChange((value: string) => {
+                  this.searchTime = value;
+                })
+            }
+            .width('100%')
+            .margin({ bottom: 15 })
+
+            Button('查询空闲座位')
+              .width('100%')
+              .height(45)
+              .fontSize(16)
+              .backgroundColor('#45B7D1')
+              .onClick(() => {
+                this.searchSeats();
+              })
+          }
+          .width('100%')
+          .padding(15)
+          .backgroundColor('#F8F8F8')
+          .borderRadius(8)
+        }
+        .width('85%')
+        .padding(15)
+        .backgroundColor('#F8F8F8')
+        .borderRadius(12)
+        .margin({ bottom: 15 })
+
+        if (this.showSearchResult) {
+          Column() {
+            Text('查询结果')
+              .fontSize(18)
+              .fontWeight(FontWeight.Medium)
+              .fontColor('#333333')
+              .margin({ bottom: 15 })
+
+            if (this.searchResults.length === 0) {
+              Column() {
+                Text('未找到符合条件的座位')
+                  .fontSize(14)
+                  .fontColor('#999999')
+                  .margin({ top: 20, bottom: 20 })
+              }
+            } else {
+              Column() {
+                ForEach(this.searchResults, (item: ClassroomSeat, index: number) => {
+                  Row() {
+                    Column() {
+                      Text(item.classroom)
+                        .fontSize(15)
+                        .fontColor('#333333')
+                        .fontWeight(FontWeight.Medium)
+                      
+                      Text(item.time)
+                        .fontSize(13)
+                        .fontColor('#666666')
+                        .margin({ top: 3 })
+                    }
+                    .alignItems(HorizontalAlign.Start)
+                    .layoutWeight(1)
+
+                    Column() {
+                      Text(item.available + '/' + item.total)
+                        .fontSize(15)
+                        .fontColor(item.status === '紧张' ? '#FF6B6B' : '#4CAF50')
+                        .fontWeight(FontWeight.Bold)
+                      
+                      Text(item.status)
+                        .fontSize(12)
+                        .fontColor(item.status === '紧张' ? '#FF6B6B' : '#4CAF50')
+                        .margin({ top: 2 })
+                    }
+                    .alignItems(HorizontalAlign.End)
+                  }
+                  .width('100%')
+                  .padding({ top: 12, bottom: 12 })
+                  .backgroundColor(index % 2 === 0 ? '#FFFFFF' : '#FAFAFA')
+                  .borderRadius(6)
+                  .margin({ bottom: 8 })
+                }, (item: ClassroomSeat, index: number) => index.toString())
+              }
+              .width('100%')
+            }
+          }
+          .width('85%')
+          .padding(15)
+          .backgroundColor('#F8F8F8')
+          .borderRadius(12)
+          .margin({ bottom: 15 })
+        }
+
+        Column() {
+          Text('座位总览')
             .fontSize(18)
             .fontWeight(FontWeight.Medium)
             .fontColor('#333333')

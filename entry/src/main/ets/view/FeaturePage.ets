@@ -129,6 +129,7 @@ export struct FeaturePage {
 
   searchSeats() {
     this.searchResults = [];
+    
     for (let i = 0; i < this.classroomSeats.length; i++) {
       const item = this.classroomSeats[i];
       let matchArea = true;
@@ -147,9 +148,7 @@ export struct FeaturePage {
       }
     }
     
-    if (this.searchResults.length > 0) {
-      this.showSearchResult = true;
-    }
+    this.showSearchResult = true;
   }
   
   private expresses: ExpressItem[] = [
@@ -424,7 +423,7 @@ export struct FeaturePage {
                 .fontColor('#666666')
                 .width(50)
               
-              TextInput({ placeholder: '输入教室名称', text: this.searchArea })
+              TextInput({ placeholder: '输入教室名称' })
                 .fontSize(14)
                 .layoutWeight(1)
                 .height(40)
@@ -443,7 +442,7 @@ export struct FeaturePage {
                 .fontColor('#666666')
                 .width(50)
               
-              TextInput({ placeholder: '输入时间段（如08:00）', text: this.searchTime })
+              TextInput({ placeholder: '输入时间段（如08:00）' })
                 .fontSize(14)
                 .layoutWeight(1)
                 .height(40)

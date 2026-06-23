@@ -428,7 +428,8 @@ export struct FeaturePage {
                 .layoutWeight(1)
                 .height(40)
                 .backgroundColor('#FFFFFF')
-                .border({ width: 1, color: '#E0E0E0', radius: 6 })
+                .borderRadius(6)
+                .border({ width: 1, color: '#E0E0E0' })
                 .onChange((value: string) => {
                   this.searchArea = value;
                 })
@@ -447,7 +448,8 @@ export struct FeaturePage {
                 .layoutWeight(1)
                 .height(40)
                 .backgroundColor('#FFFFFF')
-                .border({ width: 1, color: '#E0E0E0', radius: 6 })
+                .borderRadius(6)
+                .border({ width: 1, color: '#E0E0E0' })
                 .onChange((value: string) => {
                   this.searchTime = value;
                 })

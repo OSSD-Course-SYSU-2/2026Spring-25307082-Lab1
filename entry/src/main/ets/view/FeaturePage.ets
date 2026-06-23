@@ -507,76 +507,50 @@ export struct FeaturePage {
         .borderRadius(12)
         .margin({ bottom: 15 })
 
-        if (this.showSearchResult) {
-          Column() {
-            Row() {
-              Text('查询结果')
-                .fontSize(18)
-                .fontWeight(FontWeight.Medium)
-                .fontColor('#333333')
-              
-              Text('（共 ' + this.searchResults.length + ' 条）')
-                .fontSize(14)
-                .fontColor('#666666')
-                .margin({ left: 8 })
-            }
-            .width('100%')
+        Column() {
+          Text('查询结果')
+            .fontSize(18)
+            .fontWeight(FontWeight.Medium)
+            .fontColor('#333333')
             .margin({ bottom: 15 })
 
-            if (this.searchResults.length === 0) {
-              Column() {
-                Text('未找到符合条件的座位')
-                  .fontSize(14)
-                  .fontColor('#999999')
-                  .margin({ top: 20, bottom: 20 })
-              }
-            } else {
-              Column() {
-                ForEach(this.searchResults, (item: ClassroomSeat, index: number) => {
-                  Row() {
-                    Column() {
-                      Text(item.classroom)
-                        .fontSize(15)
-                        .fontColor('#333333')
-                        .fontWeight(FontWeight.Medium)
-                      
-                      Text(item.time)
-                        .fontSize(13)
-                        .fontColor('#666666')
-                        .margin({ top: 3 })
-                    }
-                    .alignItems(HorizontalAlign.Start)
+          Text('结果数量: ' + this.searchResults.length)
+            .fontSize(16)
+            .fontColor('#FF0000')
+            .margin({ bottom: 10 })
+
+          Text('showSearchResult: ' + this.showSearchResult)
+            .fontSize(16)
+            .fontColor('#FF0000')
+            .margin({ bottom: 15 })
+
+          if (this.searchResults.length > 0) {
+            Column() {
+              ForEach(this.searchResults, (item: ClassroomSeat, index: number) => {
+                Row() {
+                  Text(item.classroom + ' - ' + item.time)
+                    .fontSize(14)
+                    .fontColor('#333333')
                     .layoutWeight(1)
 
-                    Column() {
-                      Text(item.available + '/' + item.total)
-                        .fontSize(15)
-                        .fontColor(item.status === '紧张' ? '#FF6B6B' : '#4CAF50')
-                        .fontWeight(FontWeight.Bold)
-                      
-                      Text(item.status)
-                        .fontSize(12)
-                        .fontColor(item.status === '紧张' ? '#FF6B6B' : '#4CAF50')
-                        .margin({ top: 2 })
-                    }
-                    .alignItems(HorizontalAlign.End)
-                  }
-                  .width('100%')
-                  .padding({ top: 12, bottom: 12 })
-                  .backgroundColor(index % 2 === 0 ? '#FFFFFF' : '#FAFAFA')
-                  .borderRadius(6)
-                  .margin({ bottom: 8 })
-                }, (item: ClassroomSeat, index: number) => item.classroom + item.time)
-              }
-              .width('100%')
+                  Text(item.available + '/' + item.total)
+                    .fontSize(14)
+                    .fontColor(item.status === '紧张' ? '#FF6B6B' : '#4CAF50')
+                    .fontWeight(FontWeight.Bold)
+                }
+                .width('100%')
+                .padding(8)
+                .backgroundColor(index % 2 === 0 ? '#FFFFFF' : '#F0F0F0')
+              }, (item: ClassroomSeat, index: number) => index.toString())
             }
+            .width('100%')
           }
-          .width('85%')
-          .padding(15)
-          .backgroundColor('#F8F8F8')
-          .borderRadius(12)
-          .margin({ bottom: 15 })
         }
+        .width('85%')
+        .padding(15)
+        .backgroundColor('#F8F8F8')
+        .borderRadius(12)
+        .margin({ bottom: 15 })
 
         Column() {
           Text('座位总览')

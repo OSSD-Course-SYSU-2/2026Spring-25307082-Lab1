@@ -1,5 +1,6 @@
 import Common from '../common/constants/Const';
 import { DeviceAdapter } from '../viewmodel/DeviceAdapter';
+import { hilog } from '@kit.PerformanceAnalysisKit';
 
 export enum FeatureType {
   SCHEDULE = 0,
@@ -128,6 +129,11 @@ export struct FeaturePage {
   
 
   searchSeats() {
+    hilog.info(0x0000, 'Library', '=== 开始查询 ===');
+    hilog.info(0x0000, 'Library', 'searchArea: ' + this.searchArea);
+    hilog.info(0x0000, 'Library', 'searchTime: ' + this.searchTime);
+    hilog.info(0x0000, 'Library', 'classroomSeats数量: ' + this.classroomSeats.length);
+    
     let results: ClassroomSeat[] = [];
     
     for (let i = 0; i < this.classroomSeats.length; i++) {
@@ -145,11 +151,17 @@ export struct FeaturePage {
       
       if (matchArea && matchTime) {
         results.push(item);
+        hilog.info(0x0000, 'Library', '匹配: ' + item.classroom + ' ' + item.time);
       }
     }
     
+    hilog.info(0x0000, 'Library', '找到结果数量: ' + results.length);
+    
     this.searchResults = results;
     this.showSearchResult = true;
+    
+    hilog.info(0x0000, 'Library', 'searchResults长度: ' + this.searchResults.length);
+    hilog.info(0x0000, 'Library', 'showSearchResult: ' + this.showSearchResult);
   }
   
   private expresses: ExpressItem[] = [
@@ -467,6 +479,18 @@ export struct FeaturePage {
                 this.searchSeats();
               })
             
+            Button('显示所有座位（测试）')
+              .width('100%')
+              .height(45)
+              .fontSize(16)
+              .backgroundColor('#4CAF50')
+              .margin({ top: 10 })
+              .onClick(() => {
+                this.searchResults = this.classroomSeats;
+                this.showSearchResult = true;
+                hilog.info(0x0000, 'Library', '测试按钮：显示所有 ' + this.searchResults.length + ' 条数据');
+              })
+            
             Text('提示：不输入条件可查询所有座位')
               .fontSize(12)
               .fontColor('#999999')
@@ -485,11 +509,19 @@ export struct FeaturePage {
 
         if (this.showSearchResult) {
           Column() {
-            Text('查询结果')
-              .fontSize(18)
-              .fontWeight(FontWeight.Medium)
-              .fontColor('#333333')
-              .margin({ bottom: 15 })
+            Row() {
+              Text('查询结果')
+                .fontSize(18)
+                .fontWeight(FontWeight.Medium)
+                .fontColor('#333333')
+              
+              Text('（共 ' + this.searchResults.length + ' 条）')
+                .fontSize(14)
+                .fontColor('#666666')
+                .margin({ left: 8 })
+            }
+            .width('100%')
+            .margin({ bottom: 15 })
 
             if (this.searchResults.length === 0) {
               Column() {

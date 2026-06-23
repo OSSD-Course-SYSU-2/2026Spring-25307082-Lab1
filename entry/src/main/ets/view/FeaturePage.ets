@@ -128,7 +128,7 @@ export struct FeaturePage {
   
 
   searchSeats() {
-    this.searchResults = [];
+    let results: ClassroomSeat[] = [];
     
     for (let i = 0; i < this.classroomSeats.length; i++) {
       const item = this.classroomSeats[i];
@@ -144,10 +144,11 @@ export struct FeaturePage {
       }
       
       if (matchArea && matchTime) {
-        this.searchResults.push(item);
+        results.push(item);
       }
     }
     
+    this.searchResults = results;
     this.showSearchResult = true;
   }
   
@@ -465,6 +466,11 @@ export struct FeaturePage {
               .onClick(() => {
                 this.searchSeats();
               })
+            
+            Text('提示：不输入条件可查询所有座位')
+              .fontSize(12)
+              .fontColor('#999999')
+              .margin({ top: 8 })
           }
           .width('100%')
           .padding(15)
@@ -528,7 +534,7 @@ export struct FeaturePage {
                   .backgroundColor(index % 2 === 0 ? '#FFFFFF' : '#FAFAFA')
                   .borderRadius(6)
                   .margin({ bottom: 8 })
-                }, (item: ClassroomSeat, index: number) => index.toString())
+                }, (item: ClassroomSeat, index: number) => item.classroom + item.time)
               }
               .width('100%')
             }

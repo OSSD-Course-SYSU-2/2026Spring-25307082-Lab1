@@ -57,10 +57,11 @@ export struct IconAnimation {
     .scale(this.item.clicked ? { x: Common.SCALE_RATIO, y: Common.SCALE_RATIO } : { x: 1, y: 1 })
     .opacity(this.item.clicked ? Common.OPACITY_06 : 1)
     .onClick(() => {
-      this.item.clicked = !this.item.clicked;
-      if (this.mainFlag && !this.item.clicked) {
+      if (this.mainFlag) {
         this.featureIndex = this.item.index;
         this.showFeature = true;
+      } else {
+        this.item.clicked = !this.item.clicked;
       }
     })
     .animation(
